@@ -1,0 +1,6 @@
+[manager]
+FILL_ME ansible_ssh_common_args='-o StrictHostKeyChecking=no' ansible_user=root
+
+[workers]
+FILL_ME ansible_ssh_common_args='-o StrictHostKeyChecking=no' ansible_user=root                              
+FILL_ME ansible_ssh_common_args='-o StrictHostKeyChecking=no' ansible_user=root

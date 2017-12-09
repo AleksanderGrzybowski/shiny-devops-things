@@ -1,0 +1,35 @@
+---
+- name: Install necessary packages for Docker
+  apt:
+    update_cache: yes
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - gnupg2
+    - software-properties-common
+    - python-docker
+
+- name: Add key for docker apt repository
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+
+- name: Add Docker apt repository
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable
+    state: present
+
+- name: Install Docker
+  apt:
+    update_cache: yes
+    name: docker-ce
+    state: present
+
+- name: Enable Docker service
+  service:
+    name: docker
+    enabled: true
+    state: started
+
