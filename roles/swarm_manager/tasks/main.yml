@@ -1,0 +1,19 @@
+---
+- name: Ensure that Docker on the manager node is running in Swarm mode
+  command: docker node ls
+  register: docker_node_ls_result  
+  ignore_errors: yes
+  changed_when: False
+  
+- name: Initialize new swarm
+  command: "docker swarm init --advertise-addr={{ hostvars[groups['manager'][0]]['inventory_hostname'] }}"
+  when: docker_node_ls_result.rc != 0
+
+- name: Get join token
+  command: docker swarm join-token worker
+  register: join_token_result
+  changed_when: False
+
+- name: Remember swarm join token
+  set_fact:
+    join_command: "{{ join_token_result.stdout_lines[2] }}"

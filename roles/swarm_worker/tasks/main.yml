@@ -1,0 +1,10 @@
+---
+- name: Check if node already belongs to a swarm
+  shell: >
+    docker info | egrep '^Swarm: ' | cut -d " " -f2
+  register: swarm_status
+  changed_when: False
+  
+- name: Join node to swarm if needed
+  command: "{{ hostvars[groups['manager'][0]]['join_command'] }}"
+  when: "'active' not in swarm_status.stdout_lines"

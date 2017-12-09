@@ -11,3 +11,12 @@
   roles:
     - docker
 
+- hosts: manager
+  become: yes
+  roles:
+    - swarm_manager
+
+- hosts: workers
+  become: yes
+  roles:
+    - swarm_worker
