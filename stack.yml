@@ -13,6 +13,9 @@ services:
       - esdata:/usr/share/elasticsearch/data
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
 
   logstash:
     image: docker.elastic.co/logstash/logstash:5.3.2
@@ -39,7 +42,7 @@ services:
   kibana:
     image: docker.elastic.co/kibana/kibana:5.3.2
     ports:
-      - '80:5601'
+      - '8000:5601'
     depends_on:
       - elasticsearch
     environment:
@@ -52,14 +55,56 @@ services:
   httpd:
     image: httpd
     ports:
-      - "8000:80"
+      - "8001:80"
     deploy:
       replicas: 2
+
+  influx:
+    image: influxdb
+    volumes:
+      - influx_data:/var/lib/influxdb
+    environment:
+      INFLUXDB_DB: cadvisor
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "8002:3000"
+    environment:
+      GF_DASHBOARDS_JSON_ENABLED: 'true'
+      GF_DASHBOARDS_JSON_PATH: /dashboards
+    configs:
+      - source: dashboard_json
+        target: /dashboards/dashboard.json
+        mode: 0777
+        uid: '104'
+        gid: '107'
+    deploy:
+      replicas: 1
+
+  cadvisor:
+    image: google/cadvisor
+    hostname: '{{.Node.Hostname}}'
+    command: -logtostderr -docker_only -storage_driver=influxdb -storage_driver_db=cadvisor -storage_driver_host=influx:8086
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    deploy:
+      mode: global
 
 configs:
   logstash_conf:
     external: true
+  dashboard_json:
+    external: true
 
 volumes:
+  influx_data:
   esdata:
-    driver: local
