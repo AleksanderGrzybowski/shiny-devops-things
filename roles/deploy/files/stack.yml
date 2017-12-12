@@ -84,6 +84,17 @@ services:
         mode: 0777
         uid: '104'
         gid: '107'
+      - source: dashboards_yml
+        target: /usr/share/grafana/conf/provisioning/dashboards/dashboards.yml
+        mode: 0777
+        uid: '104'
+        gid: '107'
+      - source: influx_yml
+        target: /usr/share/grafana/conf/provisioning/datasources/influx.yml
+        mode: 0777
+        uid: '104'
+        gid: '107'
+
     deploy:
       replicas: 1
 
@@ -103,6 +114,10 @@ configs:
   logstash_conf:
     external: true
   dashboard_json:
+    external: true
+  dashboards_yml:
+    external: true
+  influx_yml:
     external: true
 
 volumes:

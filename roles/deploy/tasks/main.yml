@@ -1,12 +1,21 @@
 ---
+- name: Remove old deployment
+  command: docker stack rm mystack
+
+- name: Wait for all services down
+  pause:
+    seconds: 5
+
 - name: Copy config files to remote
   copy:
     src: "{{ item }}"
     dest: "/root/{{ item }}"
   with_items:
     - dashboard.json
+    - dashboards.yml
     - logstash.conf
     - stack.yml
+    - influx.yml
 
 - name: Set sysctl option for Elasticsearch
   sysctl:
@@ -14,14 +23,13 @@
     value: 262144
     reload: yes
 
-- name: Remove old deployment
-  command: docker stack rm mystack
-
 - name: Remove old configs
   command: "docker config rm {{ item }}"
   with_items:
     - dashboard_json
+    - dashboards_yml
     - logstash_conf
+    - influx_yml
   ignore_errors: yes
 
 - name: Set up Docker config for Kibana
@@ -29,11 +37,21 @@
   args:
     chdir: /root
 
+- name: Set up Docker config for Kibana
+  command: docker config create dashboards_yml ./dashboards.yml
+  args:
+    chdir: /root
+
+- name: Set up Docker config for Kibana 2
+  command: docker config create influx_yml ./influx.yml
+  args:
+    chdir: /root
+
 - name: Set up Docker config for Logstash
   command: docker config create logstash_conf ./logstash.conf
   args:
     chdir: /root
-    
+
 - name: Redeploy stack
   command: docker stack deploy -c stack.yml mystack
   args:
