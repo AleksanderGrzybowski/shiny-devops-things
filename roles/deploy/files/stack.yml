@@ -72,7 +72,7 @@ services:
           - node.role == manager
 
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:master
     ports:
       - "8002:3000"
     environment:
