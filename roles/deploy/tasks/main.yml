@@ -1,0 +1,41 @@
+---
+- name: Copy config files to remote
+  copy:
+    src: "{{ item }}"
+    dest: "/root/{{ item }}"
+  with_items:
+    - dashboard.json
+    - logstash.conf
+    - stack.yml
+
+- name: Set sysctl option for Elasticsearch
+  sysctl:
+    name: vm.max_map_count
+    value: 262144
+    reload: yes
+
+- name: Remove old deployment
+  command: docker stack rm mystack
+
+- name: Remove old configs
+  command: "docker config rm {{ item }}"
+  with_items:
+    - dashboard_json
+    - logstash_conf
+  ignore_errors: yes
+
+- name: Set up Docker config for Kibana
+  command: docker config create dashboard_json ./dashboard.json
+  args:
+    chdir: /root
+
+- name: Set up Docker config for Logstash
+  command: docker config create logstash_conf ./logstash.conf
+  args:
+    chdir: /root
+    
+- name: Redeploy stack
+  command: docker stack deploy -c stack.yml mystack
+  args:
+    chdir: /root
+
