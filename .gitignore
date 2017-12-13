@@ -1,2 +1,6 @@
 hosts
 *.retry
+
+primenumbers/target
+primenumbers/out
+*.iml
