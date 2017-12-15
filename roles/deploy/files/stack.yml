@@ -110,6 +110,18 @@ services:
     deploy:
       mode: global
 
+  primenumbers:
+    image: kelog/primenumbers:latest
+    ports:
+      - 8080:8080
+    deploy:
+      replicas: 8
+      restart_policy:
+        condition: any
+      placement:
+        constraints:
+          - node.role != manager
+
 configs:
   logstash_conf:
     external: true
