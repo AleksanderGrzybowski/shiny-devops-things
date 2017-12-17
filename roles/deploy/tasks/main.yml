@@ -2,7 +2,7 @@
 - name: Remove old deployment
   command: docker stack rm mystack
 
-- name: Wait for all services down
+- name: Wait for all services to shut down
   pause:
     seconds: 5
 
@@ -26,31 +26,21 @@
 - name: Remove old configs
   command: "docker config rm {{ item }}"
   with_items:
-    - dashboard_json
-    - dashboards_yml
-    - logstash_conf
-    - influx_yml
+    - dashboard.json
+    - dashboards.yml
+    - logstash.conf
+    - influx.yml
   ignore_errors: yes
 
-- name: Set up Docker config for Kibana
-  command: docker config create dashboard_json ./dashboard.json
+- name: Set up new Docker configs
+  command: "docker config create {{ item }} ./{{ item }}"
   args:
     chdir: /root
-
-- name: Set up Docker config for Kibana
-  command: docker config create dashboards_yml ./dashboards.yml
-  args:
-    chdir: /root
-
-- name: Set up Docker config for Kibana 2
-  command: docker config create influx_yml ./influx.yml
-  args:
-    chdir: /root
-
-- name: Set up Docker config for Logstash
-  command: docker config create logstash_conf ./logstash.conf
-  args:
-    chdir: /root
+  with_items:
+    - dashboard.json
+    - dashboards.yml
+    - influx.yml
+    - logstash.conf
 
 - name: Redeploy stack
   command: docker stack deploy -c stack.yml mystack

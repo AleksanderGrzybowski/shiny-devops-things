@@ -12,7 +12,7 @@
     - software-properties-common
     - python-docker
 
-- name: Add key for docker apt repository
+- name: Add key for Docker apt repository
   apt_key:
     url: https://download.docker.com/linux/ubuntu/gpg
 

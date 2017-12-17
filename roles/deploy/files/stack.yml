@@ -24,7 +24,7 @@ services:
     deploy:
       replicas: 1
     configs:
-      - source: logstash_conf
+      - source: logstash.conf
         target: /usr/share/logstash/pipeline/logstash.conf
     deploy:
       replicas: 1
@@ -79,17 +79,17 @@ services:
       GF_DASHBOARDS_JSON_ENABLED: 'true'
       GF_DASHBOARDS_JSON_PATH: /dashboards
     configs:
-      - source: dashboard_json
+      - source: dashboard.json
         target: /dashboards/dashboard.json
         mode: 0777
         uid: '104'
         gid: '107'
-      - source: dashboards_yml
+      - source: dashboards.yml
         target: /usr/share/grafana/conf/provisioning/dashboards/dashboards.yml
         mode: 0777
         uid: '104'
         gid: '107'
-      - source: influx_yml
+      - source: influx.yml
         target: /usr/share/grafana/conf/provisioning/datasources/influx.yml
         mode: 0777
         uid: '104'
@@ -126,13 +126,13 @@ services:
           - node.role != manager
 
 configs:
-  logstash_conf:
+  logstash.conf:
     external: true
-  dashboard_json:
+  dashboard.json:
     external: true
-  dashboards_yml:
+  dashboards.yml:
     external: true
-  influx_yml:
+  influx.yml:
     external: true
 
 volumes:
